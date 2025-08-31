@@ -1,2 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+venv/
+.env
+
+# Logs
+*.log
+
+# Reports
+reports/
+
 # Temp files
 temp/
