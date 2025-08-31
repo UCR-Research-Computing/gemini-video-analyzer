@@ -1,10 +1,51 @@
 import os
 import google.generativeai as genai
-from dotenv import load_dotenv
+from google.cloud import secretmanager
 import logging
 import re
 import json
 from tqdm import tqdm
+
+# --- GCP Secret Manager Integration ---
+def get_gemini_api_key_from_secret_manager():
+    """
+    Fetches the Gemini API key from Google Cloud Secret Manager.
+
+    This function requires the following to be configured in the GCP environment:
+    1.  A GCP Project ID.
+    2.  The Secret Manager API enabled.
+    3.  A secret containing the API key.
+    4.  The VM's service account must have the 'Secret Manager Secret Accessor' role.
+    """
+    try:
+        # --- CONFIGURATION REQUIRED ---
+        # TODO: Replace with your GCP Project ID and Secret ID.
+        project_id = "your-gcp-project-id"
+        secret_id = "gemini-api-key" 
+        # ------------------------------
+
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+        
+        logging.info(f"Fetching secret '{secret_id}' from GCP Secret Manager...")
+        response = client.access_secret_version(request={"name": name})
+        
+        api_key = response.payload.data.decode("UTF-8")
+        logging.info("Successfully retrieved API key from Secret Manager.")
+        return api_key
+    except Exception as e:
+        logging.critical(f"Failed to access secret from GCP Secret Manager: {e}")
+        logging.critical("Please ensure the GCP Project ID and Secret ID are correct, and that the service account has the required IAM permissions.")
+        return None
+
+def configure_gemini():
+    """Configures the Gemini client with an API key from Secret Manager."""
+    api_key = get_gemini_api_key_from_secret_manager()
+    if not api_key:
+        return False
+    genai.configure(api_key=api_key)
+    return True
+# ------------------------------------
 
 def parse_json_from_markdown(markdown_text):
     """Extracts and parses a JSON object from a Markdown code block."""
@@ -27,17 +68,12 @@ def analyze_frames_with_gemini(frames, model_name, focus, language):
     Analyzes frames using a Gemini model and returns the full markdown
     and a parsed JSON object.
     """
-    # (The existing frame analysis code remains unchanged)
     if not frames:
         logging.warning("No frames were provided for analysis.")
         return None, None
 
-    load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        logging.critical("GEMINI_API_KEY not found. Please set it in a .env file.")
+    if not configure_gemini():
         return None, None
-    genai.configure(api_key=api_key)
 
     model = genai.GenerativeModel(f'models/{model_name}')
     logging.info(f"Analyzing frames with {model_name}...")
@@ -112,12 +148,8 @@ def analyze_video_with_gemini(video_path, model_name, focus, language):
     Analyzes a video file directly using a Gemini model, including audio.
     Returns the full markdown and a parsed JSON object.
     """
-    load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        logging.critical("GEMINI_API_KEY not found. Please set it in a .env file.")
+    if not configure_gemini():
         return None, None
-    genai.configure(api_key=api_key)
 
     model = genai.GenerativeModel(f'models/{model_name}')
     logging.info(f"Uploading video file: {video_path}...")
