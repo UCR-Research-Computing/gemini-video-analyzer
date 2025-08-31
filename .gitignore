@@ -1,19 +1,2 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Environment
-.env
-venv/
-
-# Reports - These are generated artifacts and should not be in version control
-reports/
-
-# Logs
-*.log
-
-# IDE/Editor specific
-.vscode/
-.idea/
+# Temp files
+temp/

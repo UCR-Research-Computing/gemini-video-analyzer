@@ -1,0 +1,11 @@
+prefix=/home/chuck/gemini_video_analyzer/venv
+exec_prefix=/home/chuck/gemini_video_analyzer/venv
+libdir=/home/chuck/gemini_video_analyzer/venv/lib
+includedir=/home/chuck/gemini_video_analyzer/venv/include
+
+Name: uuid
+Description: Universally unique id library
+Version: 2.38.1
+Requires:
+Cflags: -I${includedir}/uuid
+Libs: -L${libdir} -luuid
