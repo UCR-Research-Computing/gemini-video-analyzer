@@ -1,0 +1,18 @@
+{
+    "emotional_state": "Subdued, controlled, with underlying anxiety",
+    "sentiment": {
+        "classification": "Negative (leaning towards Neutral)",
+        "justification": "Lack of positive expressions, closed body language, and the context of an interrogation suggest apprehension and unease. However, consistent composure prevents a strongly negative classification."
+    },
+    "confidence_level": "Low",
+    "key_observations": [
+        {
+            "type": "facial_expression",
+            "detail": "Downcast eyes, subtle frowning, tightened lips, absence of smiling"
+        },
+        {
+            "type": "body_language",
+            "detail": "Closed posture (crossed arms), limited gestures, upright but not rigid posture, minor fidgeting"
+        }
+    ]
+}

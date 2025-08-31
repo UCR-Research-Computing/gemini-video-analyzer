@@ -1,0 +1,21 @@
+2025-08-31 12:58:55,256 - INFO - --- Starting new analysis run ---
+2025-08-31 12:58:55,256 - INFO - Command line arguments: {'video_inputs': ['https://youtube.com/clip/UgkxaPjipxal9El9HR9nkEhPnAtCXYK6ZcE3?si=6zgynxIAjhy0qs0Q'], 'model': 'gemini-1.5-flash', 'interval': 1, 'focus': None, 'language': None}
+2025-08-31 12:58:55,256 - INFO - --- Processing input: https://youtube.com/clip/UgkxaPjipxal9El9HR9nkEhPnAtCXYK6ZcE3?si=6zgynxIAjhy0qs0Q ---
+2025-08-31 12:58:55,256 - INFO - Input is a YouTube URL. Starting download...
+2025-08-31 12:58:55,257 - INFO - Attempting to download video from URL: https://youtube.com/clip/UgkxaPjipxal9El9HR9nkEhPnAtCXYK6ZcE3?si=6zgynxIAjhy0qs0Q
+2025-08-31 12:58:55,257 - INFO - Using yt-dlp for download...
+2025-08-31 12:59:37,571 - INFO - Successfully downloaded with yt-dlp: temp/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.webm
+2025-08-31 12:59:37,571 - INFO - Converting Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.webm to MP4 format...
+2025-08-31 13:00:33,837 - INFO - Successfully converted video to temp/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.mp4
+2025-08-31 13:00:33,840 - INFO - Removed original file: temp/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.webm
+2025-08-31 13:00:33,859 - INFO - SHA256 Hash for Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.webm: a4d90e7c4af15fb20e49b9c9788fc79417786e55390403c5b9d2f81266a70112
+2025-08-31 13:00:33,916 - INFO - Extracting frames from Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.mp4...
+2025-08-31 13:00:48,035 - INFO - Extracted 63 frames from Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime.mp4.
+2025-08-31 13:00:48,036 - INFO - Analyzing frames with gemini-1.5-flash...
+2025-08-31 13:01:24,242 - INFO - Successfully received and parsed response from Gemini.
+2025-08-31 13:01:24,243 - INFO - Saving reports to: reports/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime/gemini-1.5-flash/20250831-001
+2025-08-31 13:01:24,243 - INFO - Markdown report saved to: reports/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime/gemini-1.5-flash/20250831-001/analysis.md
+2025-08-31 13:01:24,243 - INFO - JSON report saved to: reports/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime/gemini-1.5-flash/20250831-001/analysis.json
+2025-08-31 13:01:24,249 - INFO - HTML report saved to: reports/Killer Believes She’s Smarter Than the Detectives ｜ Police Interrogation True Crime/gemini-1.5-flash/20250831-001/analysis.html
+2025-08-31 13:01:24,250 - INFO - Cleaned up temporary directory.
+2025-08-31 13:01:24,250 - INFO - --- Analysis run finished ---
