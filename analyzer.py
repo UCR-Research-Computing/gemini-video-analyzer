@@ -2,7 +2,14 @@ import os
 import sys
 import argparse
 import logging
-from src.video_processing import extract_frames, get_video_hash
+import shutil
+from src.video_processing import (
+    extract_frames, 
+    get_video_hash, 
+    is_youtube_url,
+    download_youtube_video,
+    convert_to_mp4
+)
 from src.gemini_analysis import analyze_frames_with_gemini
 from src.report_generation import create_output_directory, save_reports
 
@@ -25,7 +32,7 @@ def main():
         description="A research-grade tool to analyze human behavior in videos using Gemini AI.",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    parser.add_argument("video_files", nargs='+', help="Paths to the video files to analyze.")
+    parser.add_argument("video_inputs", nargs='+', help="Local paths or YouTube URLs of the videos to analyze.")
     
     parser.add_argument(
         "-m", "--model", 
@@ -47,38 +54,64 @@ def main():
     logging.info("--- Starting new analysis run ---")
     logging.info(f"Command line arguments: {vars(args)}")
 
-    for video_file in args.video_files:
-        logging.info(f"--- Processing video: {video_file} ---")
+    for video_input in args.video_inputs:
+        logging.info(f"--- Processing input: {video_input} ---")
         
-        # 1. Get video hash for data integrity
-        video_hash = get_video_hash(video_file)
-        if not video_hash:
-            logging.warning(f"Could not hash video {video_file}. Skipping.")
+        processed_video_path = None
+        original_filename = ""
+
+        if os.path.exists(video_input):
+            logging.info("Input is a local file.")
+            processed_video_path = video_input
+            original_filename = os.path.basename(video_input)
+        elif is_youtube_url(video_input):
+            logging.info("Input is a YouTube URL. Starting download...")
+            downloaded_path = download_youtube_video(video_input)
+            if downloaded_path:
+                original_filename = os.path.basename(downloaded_path)
+                processed_video_path = convert_to_mp4(downloaded_path)
+        else:
+            logging.error(f"Input '{video_input}' is not a valid file path or YouTube URL. Skipping.")
             continue
-        logging.info(f"SHA256 Hash for {os.path.basename(video_file)}: {video_hash}")
+
+        if not processed_video_path:
+            logging.error(f"Failed to acquire or process video from '{video_input}'. Skipping.")
+            continue
+
+        # 1. Get video hash for data integrity
+        video_hash = get_video_hash(processed_video_path)
+        if not video_hash:
+            logging.warning(f"Could not hash video {original_filename}. Skipping.")
+            continue
+        logging.info(f"SHA256 Hash for {original_filename}: {video_hash}")
 
         # 2. Extract frames
-        frames = extract_frames(video_file, args.interval)
+        frames = extract_frames(processed_video_path, args.interval)
         if not frames:
-            logging.warning(f"Frame extraction failed for {video_file}. Skipping.")
+            logging.warning(f"Frame extraction failed for {original_filename}. Skipping.")
             continue
 
         # 3. Analyze with Gemini
         analysis_md, analysis_json = analyze_frames_with_gemini(frames, args.model, args.focus, args.language)
         if not analysis_md:
-            logging.warning(f"Gemini analysis failed for {video_file}. Skipping report generation.")
+            logging.warning(f"Gemini analysis failed for {original_filename}. Skipping report generation.")
             continue
 
         # 4. Create output directory
-        output_dir = create_output_directory("reports", os.path.basename(video_file), args.model)
+        output_dir = create_output_directory("reports", original_filename, args.model)
         if not output_dir:
-            logging.error(f"Could not create output directory for {video_file}. Skipping report generation.")
+            logging.error(f"Could not create output directory for {original_filename}. Skipping report generation.")
             continue
         
         logging.info(f"Saving reports to: {output_dir}")
 
         # 5. Save all reports
-        save_reports(output_dir, analysis_md, analysis_json, os.path.basename(video_file))
+        save_reports(output_dir, analysis_md, analysis_json, original_filename)
+
+    # Clean up temp directory after run
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
+        logging.info("Cleaned up temporary directory.")
 
     logging.info("--- Analysis run finished ---")
 
