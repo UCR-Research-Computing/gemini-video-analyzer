@@ -10,7 +10,7 @@ from src.video_processing import (
     download_youtube_video,
     convert_to_mp4
 )
-from src.gemini_analysis import analyze_frames_with_gemini
+from src.gemini_analysis import analyze_frames_with_gemini, analyze_video_with_gemini
 from src.report_generation import create_output_directory, save_reports
 
 def setup_logging():
@@ -45,7 +45,16 @@ def main():
 - gemini-2.5-pro:   The state-of-the-art model for highest quality analysis.'''
     )
     
-    parser.add_argument("-i", "--interval", type=int, default=1, help="Interval in seconds between frame captures. Default is 1 second.")
+    parser.add_argument(
+        "--analysis-mode",
+        choices=['frames', 'video'],
+        default='frames',
+        help='''The method for analysis.
+- frames: (Default) Extracts frames as images and analyzes them visually.
+- video:  Uploads the full video for combined visual and audio analysis.'''
+    )
+    
+    parser.add_argument("-i", "--interval", type=int, default=1, help="Interval in seconds between frame captures (only used in 'frames' mode).")
     parser.add_argument("-f", "--focus", type=str, default=None, help="Specify the focus of the analysis (e.g., 'the person on the left').")
     parser.add_argument("-l", "--language", type=str, default=None, help="The output language for the analysis report (e.g., 'Spanish').")
 
@@ -78,37 +87,35 @@ def main():
             logging.error(f"Failed to acquire or process video from '{video_input}'. Skipping.")
             continue
 
-        # 1. Get video hash for data integrity
         video_hash = get_video_hash(processed_video_path)
         if not video_hash:
             logging.warning(f"Could not hash video {original_filename}. Skipping.")
             continue
         logging.info(f"SHA256 Hash for {original_filename}: {video_hash}")
 
-        # 2. Extract frames
-        frames = extract_frames(processed_video_path, args.interval)
-        if not frames:
-            logging.warning(f"Frame extraction failed for {original_filename}. Skipping.")
-            continue
+        analysis_md, analysis_json = None, None
+        if args.analysis_mode == 'frames':
+            frames = extract_frames(processed_video_path, args.interval)
+            if frames:
+                analysis_md, analysis_json = analyze_frames_with_gemini(frames, args.model, args.focus, args.language)
+            else:
+                logging.warning(f"Frame extraction failed for {original_filename}. Skipping.")
+                continue
+        elif args.analysis_mode == 'video':
+            analysis_md, analysis_json = analyze_video_with_gemini(processed_video_path, args.model, args.focus, args.language)
 
-        # 3. Analyze with Gemini
-        analysis_md, analysis_json = analyze_frames_with_gemini(frames, args.model, args.focus, args.language)
         if not analysis_md:
             logging.warning(f"Gemini analysis failed for {original_filename}. Skipping report generation.")
             continue
 
-        # 4. Create output directory
         output_dir = create_output_directory("reports", original_filename, args.model)
         if not output_dir:
             logging.error(f"Could not create output directory for {original_filename}. Skipping report generation.")
             continue
         
         logging.info(f"Saving reports to: {output_dir}")
-
-        # 5. Save all reports
         save_reports(output_dir, analysis_md, analysis_json, original_filename)
 
-    # Clean up temp directory after run
     if os.path.exists("temp"):
         shutil.rmtree("temp")
         logging.info("Cleaned up temporary directory.")
