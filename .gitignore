@@ -16,3 +16,5 @@ reports/
 
 # Temp files
 temp/
+analysis.log
+__pycache__/
