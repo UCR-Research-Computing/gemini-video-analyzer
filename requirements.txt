@@ -1,6 +1,5 @@
 google-generativeai
-google-cloud-secret-manager
 opencv-python
 markdown2
 tqdm
-
+python-dotenv
