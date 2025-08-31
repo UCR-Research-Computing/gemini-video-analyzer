@@ -49,47 +49,36 @@ gemini_video_analyzer/
 │   ├── report_generation.py  # Manages the creation of output files and directories
 │   └── video_processing.py   # Handles video downloading, conversion, and frame extraction
 │
-└── temp/               # Temporary storage for downloaded videos (auto-cleaned)
+└── venv/               # Directory for the isolated micromamba environment
 ```
 
 ---
 
-## 4. File Manifest
+## 4. Prerequisites
 
-| File/Directory | Purpose |
-| :--- | :--- |
-| **`analyzer.py`** | The main script to execute. It parses command-line arguments and orchestrates the analysis workflow by calling the various modules. |
-| **`src/gemini_analysis.py`** | Contains the functions that construct the prompts and make calls to the Gemini API. Includes logic for both `frames` and `video` analysis modes. |
-| **`src/video_processing.py`** | Handles all video acquisition and preparation. Downloads from YouTube, converts formats using `ffmpeg`, calculates the SHA256 hash, and extracts frames with `OpenCV`. |
-| **`src/report_generation.py`** | Manages the output. Creates the structured directory path for each run and saves the Markdown, HTML, and JSON report files. |
-| **`requirements.txt`** | A list of all Python packages required for the project. Used to create the isolated `micromamba` environment. |
-| **`.env`** | A user-created file (not in Git) to securely store the `GEMINI_API_KEY`. |
-| **`analysis.log`** | A persistent log file. All script operations, from starting a run to errors and completion, are recorded here with timestamps. |
-| **`README.md`** | This file. |
-| **`reports/`** | The default output directory for all generated analysis. |
-| **`temp/`** | A temporary directory for storing downloaded and converted videos before they are processed. It is automatically deleted at the end of a successful run. |
+Before setting up the project, you must have the following software installed on your system.
 
----
-
-## 5. Prerequisites
-
-Before setting up the project, you must have the following software installed on your system (these instructions are for Debian/Ubuntu-based Linux):
-
-1.  **Micromamba:** A fast and lightweight conda package manager.
+1.  **Micromamba:** A fast, native, and lightweight conda package manager. This is required to create a consistent and isolated environment for the project's Python dependencies.
     ```bash
-    # Download and install micromamba
+    # Download and install micromamba on Linux or macOS
     "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
-    # Follow the on-screen instructions to initialize your shell
+
+    # Follow the on-screen instructions to initialize your shell.
+    # You will likely need to restart your terminal or source your shell's config file (e.g., source ~/.bashrc).
     ```
 
-2.  **FFmpeg:** A powerful multimedia framework used for video conversion.
+2.  **FFmpeg:** A powerful multimedia framework used by the tool for video conversion.
     ```bash
+    # On Debian/Ubuntu-based Linux
     sudo apt update && sudo apt install ffmpeg -y
+
+    # On macOS using Homebrew
+    brew install ffmpeg
     ```
 
 ---
 
-## 6. Setup and Installation
+## 5. Setup and Installation
 
 1.  **Clone the Repository:**
     ```bash
@@ -97,13 +86,13 @@ Before setting up the project, you must have the following software installed on
     cd gemini_video_analyzer
     ```
 
-2.  **Create the Environment:**
-    Use `micromamba` to create an isolated Python environment and install all necessary dependencies from the `requirements.txt` file.
+2.  **Create the Micromamba Environment:**
+    Use `micromamba` to create an isolated Python environment in a local `venv` directory and install all necessary dependencies from the `requirements.txt` file.
     ```bash
-    # Create the environment in a 'venv' subdirectory
+    # Create the environment using Python 3.12
     micromamba create -p ./venv python=3.12 -y
 
-    # Install packages using pip within the new environment
+    # Install all required packages using pip within the new environment
     micromamba run -p ./venv pip install -r requirements.txt
     ```
 
@@ -112,28 +101,28 @@ Before setting up the project, you must have the following software installed on
     1.  Create a file named `.env` in the root of the project directory: `touch .env`
     2.  Open the file and add your API key in the following format:
         ```
-        GEMINI_API_KEY=AIzaSy...your...api...key...
+        GEMINI_API_KEY="AIzaSy...your...api...key..."
         ```
 
 ---
 
-## 7. Usage
+## 6. Usage
 
-All commands must be run from the root of the `gemini_video_analyzer` directory.
+All commands must be run from the root of the `gemini_video_analyzer` directory. The `micromamba run -p ./venv` prefix is essential as it executes the command within the project's isolated environment.
 
-### 7.1. Basic Commands
+### 6.1. Basic Commands
 
 **Analyze a local video file:**
 ```bash
-micromamba run -p ./venv python analyzer.py /path/to/my_video.mp4
+micromamba run -p ./venv python3 analyzer.py /path/to/my_video.mp4
 ```
 
 **Analyze a video from a YouTube URL:**
 ```bash
-micromamba run -p ./venv python analyzer.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+micromamba run -p ./venv python3 analyzer.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
 
-### 7.2. Command-Line Arguments
+### 6.2. Command-Line Arguments
 
 You can control the analysis with the following flags:
 
@@ -146,11 +135,11 @@ You can control the analysis with the following flags:
 | `--focus` | `-f` | **(Default: None)** Specifies a subject for the AI to focus on (e.g., "the person in the red shirt"). |
 | `--language` | `-l` | **(Default: None)** The output language for the report (e.g., "Spanish", "Japanese"). |
 
-### 7.3. Advanced Examples
+### 6.3. Advanced Examples
 
 **High-quality video/audio analysis on a specific person:**
 ```bash
-micromamba run -p ./venv python analyzer.py "https://youtube.com/clip/..." \
+micromamba run -p ./venv python3 analyzer.py "https://youtube.com/clip/..." \
     --model gemini-2.5-pro \
     --analysis-mode video \
     --focus "the detective asking questions"
@@ -158,26 +147,26 @@ micromamba run -p ./venv python analyzer.py "https://youtube.com/clip/..." \
 
 **Frame-based analysis in another language:**
 ```bash
-micromamba run -p ./venv python analyzer.py /path/to/local_video.mp4 \
+micromamba run -p ./venv python3 analyzer.py /path/to/local_video.mp4 \
     --analysis-mode frames \
     --language "German"
 ```
 
 ---
 
-## 8. Output
+## 7. Output
 
 The script generates a structured, timestamped directory for each analysis run to ensure results are never overwritten.
 
 **Output Directory Structure:**
 ```
 reports/
-└── [video_filename_without_extension]/
-    └── [model_name]/
-        └── [YYYYMMDD]-[run_number]/
-            ├── analysis.md      (Markdown Report)
-            ├── analysis.html    (HTML Report)
-            └── analysis.json    (JSON Data)
+    └── [video_filename_without_extension]/
+        └── [model_name]/
+            └── [YYYYMMDD]-[run_number]/
+                ├── analysis.md      (Markdown Report)
+                ├── analysis.html    (HTML Report)
+                └── analysis.json    (JSON Data)
 ```
 
 -   **`analysis.md`**: A human-readable report in Markdown format.
