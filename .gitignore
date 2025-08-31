@@ -18,3 +18,5 @@ reports/
 temp/
 analysis.log
 __pycache__/
+.env
+reports/
