@@ -1,0 +1,5 @@
+google-generativeai
+opencv-python
+markdown2
+tqdm
+python-dotenv
