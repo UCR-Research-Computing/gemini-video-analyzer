@@ -129,8 +129,8 @@ You can control the analysis with the following flags:
 | Argument | Short | Description |
 | :--- | :--- | :--- |
 | `video_inputs` | (Positional) | One or more local file paths or YouTube URLs. |
-| `--model` | `-m` | **(Default: `gemini-1.5-flash`)** Sets the AI model. Choices: `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`. |
-| `--analysis-mode`| | **(Default: `frames`)** Sets the analysis method. `frames` for visual-only, `video` for combined visual and audio. |
+| `--model` | `-m` | **(Default: `gemini-2.5-pro`)** Sets the AI model. Choices: `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`. |
+| `--analysis-mode`| | **(Default: `video`)** Sets the analysis method. `frames` for visual-only, `video` for combined visual and audio. |
 | `--interval` | `-i` | **(Default: `1`)** Seconds between frame captures. Only used in `frames` mode. |
 | `--focus` | `-f` | **(Default: None)** Specifies a subject for the AI to focus on (e.g., "the person in the red shirt"). |
 | `--language` | `-l` | **(Default: None)** The output language for the report (e.g., "Spanish", "Japanese"). |
