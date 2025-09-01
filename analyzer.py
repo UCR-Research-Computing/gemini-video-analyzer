@@ -37,21 +37,21 @@ def main():
     parser.add_argument(
         "-m", "--model", 
         choices=['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'],
-        default='gemini-1.5-flash',
+        default='gemini-2.5-pro',
         help='''The Gemini model to use for analysis.
-- gemini-1.5-flash: (Default) Fast and cost-effective.
+- gemini-1.5-flash: Fast and cost-effective.
 - gemini-1.5-pro:   Higher quality, more detailed analysis.
 - gemini-2.5-flash: The next-generation fast and efficient model.
-- gemini-2.5-pro:   The state-of-the-art model for highest quality analysis.'''
+- gemini-2.5-pro:   (Default) The state-of-the-art model for highest quality analysis.'''
     )
     
     parser.add_argument(
         "--analysis-mode",
         choices=['frames', 'video'],
-        default='frames',
+        default='video',
         help='''The method for analysis.
-- frames: (Default) Extracts frames as images and analyzes them visually.
-- video:  Uploads the full video for combined visual and audio analysis.'''
+- frames: Extracts frames as images and analyzes them visually.
+- video:  (Default) Uploads the full video for combined visual and audio analysis.'''
     )
     
     parser.add_argument("-i", "--interval", type=int, default=1, help="Interval in seconds between frame captures (only used in 'frames' mode).")
