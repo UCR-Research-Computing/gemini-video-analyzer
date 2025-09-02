@@ -6,6 +6,8 @@ import logging
 import re
 import subprocess
 
+import yt_dlp
+
 TEMP_DIR = "temp"
 
 def is_youtube_url(url):
@@ -18,68 +20,36 @@ def is_youtube_url(url):
 
 def download_youtube_video(url):
     """
-    Downloads a video from a YouTube URL using yt-dlp, falling back to pytubefix.
+    Downloads a video from a YouTube URL using the yt-dlp library.
     Returns the path to the downloaded file.
     """
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
 
-    logging.info(f"Attempting to download video from URL: {url}")
-    
-    # Define output template for yt-dlp to control filename
+    logging.info(f"Attempting to download video from URL: {url} using yt-dlp library.")
+
     output_template = os.path.join(TEMP_DIR, '%(title)s.%(ext)s')
 
-    # Try with yt-dlp first
+    ydl_opts = {
+        'outtmpl': output_template,
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'quiet': True,
+    }
+
     try:
-        logging.info("Using yt-dlp for download...")
-        # We need to capture the output to find the filename
-        result = subprocess.run(
-            ['/home/chuck/bin/yt-dlp', '--print', 'filename', '-o', output_template, url],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        downloaded_file_path = result.stdout.strip()
-        
-        # Now run the actual download
-        subprocess.run(
-            ['/home/chuck/bin/yt-dlp', '-o', output_template, url],
-            check=True,
-            capture_output=True # Suppress verbose output in main log
-        )
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            downloaded_file_path = ydl.prepare_filename(info)
 
         if os.path.exists(downloaded_file_path):
-            logging.info(f"Successfully downloaded with yt-dlp: {downloaded_file_path}")
+            logging.info(f"Successfully downloaded: {downloaded_file_path}")
             return downloaded_file_path
         else:
-            raise FileNotFoundError("yt-dlp reported success but file not found.")
-
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logging.warning(f"yt-dlp failed: {e}. Falling back to pytubefix.")
-        
-        # Fallback to pytubefix
-        try:
-            logging.info("Using pytubefix for download...")
-            # pytubefix downloads to the current directory, so we run it from inside temp
-            subprocess.run(
-                ['/home/chuck/bin/pytubefix', url],
-                check=True,
-                cwd=TEMP_DIR,
-                capture_output=True # Suppress verbose output
-            )
-            # This is a bit of a guess, as pytubefix doesn't tell us the filename.
-            # We'll have to find the newest file in the temp dir.
-            files = [os.path.join(TEMP_DIR, f) for f in os.listdir(TEMP_DIR)]
-            if not files:
-                logging.error("pytubefix ran but no file was created.")
-                return None
-            latest_file = max(files, key=os.path.getctime)
-            logging.info(f"Successfully downloaded with pytubefix: {latest_file}")
-            return latest_file
-
-        except (subprocess.CalledProcessError, FileNotFoundError) as e_pytube:
-            logging.error(f"pytubefix also failed: {e_pytube}")
+            logging.error("yt-dlp reported success but the file was not found.")
             return None
+    except Exception as e:
+        logging.error(f"Failed to download video with yt-dlp library: {e}")
+        return None
 
 def convert_to_mp4(video_path):
     """

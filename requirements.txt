@@ -3,3 +3,4 @@ opencv-python
 markdown2
 tqdm
 python-dotenv
+yt-dlp
