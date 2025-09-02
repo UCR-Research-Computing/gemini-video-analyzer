@@ -1,6 +1,6 @@
 # Gemini Video Behavior Analyzer
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/UCR-Research-Computing/gemini-video-analyzer/blob/main/colab_demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/UCR-Research-Computing/gemini-video-analyzer/blob/master/colab_demo.ipynb)
 
 ## 1. Overview
 
