@@ -1,5 +1,7 @@
 # Gemini Video Behavior Analyzer
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/UCR-Research-Computing/gemini-video-analyzer/blob/main/colab_demo.ipynb)
+
 ## 1. Overview
 
 This project is a research-grade command-line tool for analyzing human behavior in videos using Google's Gemini multimodal AI models. It can process local video files (`.mp4`, `.webm`, etc.) or directly download and analyze videos from YouTube URLs.
